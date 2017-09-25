@@ -10,8 +10,8 @@
     "type": "git",
     "url": "git+https://github.com/gtdalp/listloading.git"
   },
-  "author": "xisa",
-  "license": "ISC",
+  "author": "bigmeow",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/gtdalp/listloading/issues"
   },

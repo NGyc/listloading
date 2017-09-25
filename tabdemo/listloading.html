@@ -12,11 +12,11 @@
 <script src="iconfont.js"></script>
 <script>
 // 
-require(['zepto', 'iscroll', 'listloading'], function(){
+require([ 'iscroll', 'listloading'], function(){
     var Listloading = require('listloading');
     var m = 3;
     var n = 0;
-    var hei = $(window).height();
+    var hei = window.innerHeight;;
     var arr = ['baby_food', 'carrycot', 'feeding_bottle', 'feeding_bottle2', 'tricycle', 'rattle', 'rattle6', 'mobile', 'pin', 'safety_seat', 'pin']
     
     // 模板
@@ -44,7 +44,14 @@ require(['zepto', 'iscroll', 'listloading'], function(){
             if(m < 1){
                 flg = true;
             }else{
-                $('#order-list').append(__html);
+                function parseStringToHTML(text) {
+                    var i, a = document.createElement("div"),
+                    b = document.createDocumentFragment();
+                    a.innerHTML = text;
+                    while (i = a.firstChild) b.appendChild(i);
+                    return b;
+                }
+                document.getElementById('order-list').appendChild(parseStringToHTML(__html));
             }
             // 数据加载完毕需要返回 end为true则为全部数据加载完毕
             cb(flg);
@@ -57,7 +64,7 @@ require(['zepto', 'iscroll', 'listloading'], function(){
             }
             m = 3;
             var __html = createHtml('TAB1');
-            $('#order-list').html(__html);
+            document.getElementById('order-list').innerHTML = __html;
             // 执行完执行方法之后必须执行回调 回调的作用是通知默认加载已经全部执行完毕，程序需要去创建iscroll或者做下拉刷新动作
             cb();
         },
@@ -74,11 +81,13 @@ require(['zepto', 'iscroll', 'listloading'], function(){
             pullDownAction : function(cb, flg){
                 m = 3;
                 var __html = createHtml('TAB2');
-                $('#order-list2').html(__html);
+                
+                document.querySelector('#order-list2').innerHTML = __html;
                 cb();
             },
             Realtimetxt: '官人不要，请放开我！',
-            loaderendtxt: '我是有底线的'
+            loaderendtxt: '我是有底线的',
+            pullUpAction:function(){}
         });
     }
     // tab3
@@ -87,7 +96,8 @@ require(['zepto', 'iscroll', 'listloading'], function(){
             pullDownAction : function(cb, flg){
                 m = 3;
                 var __html = createHtml('TAB3');
-                $('#order-list3').html(__html);
+                
+                document.querySelector('#order-list3').innerHTML = __html;
                 cb();
             },
             Realtimetxt: '官人不要，请放开我！',
@@ -98,26 +108,48 @@ require(['zepto', 'iscroll', 'listloading'], function(){
     var tabFirstLoad2 = true;
     var tabFirstLoad3 = true;
     // 切换
-    $('#listloadingtab>span').click(function() {
-        var index = $(this).index();
-        $('#listloadingtab>span').eq(index).addClass('active').siblings().removeClass('active');
-        $('.listloading-tab').hide();
-        $('.listloading-tab').eq(index).show();
-        // 第二个tab
-        if (index === 1 && tabFirstLoad2) {
-            tabFirstLoad2 = false;
-            Tab2Listloading();
-        } 
-        // 第三个tab
-        else if (index === 2 && tabFirstLoad3) {
-            tabFirstLoad3 = false;
-            Tab3Listloading();
-        }
-    });
+    document.querySelectorAll('#listloadingtab>span').forEach((item,index)=>{
+        console.log(index)
+        item.onclick=function(){
+            let _this = this;
+
+            _this.classList.add('active');
+
+            Array.from(_this.parentNode.children)
+            .filter(function(child){
+                return child !== _this;
+            })
+            .forEach(item=>{
+                item.classList.remove('active');
+            });
+
+            let listloadingTab = Array.from(document.querySelectorAll('.listloading-tab'));
+
+            listloadingTab.forEach((item,i)=>{
+                item.style.display = 'none' ;
+                if(i===index){
+                    item.style.display = 'block';
+                }
+            })
+           // document.querySelector('.listloading-tab')[index].show();
+            
+            // 第二个tab
+            if (index === 1 && tabFirstLoad2) {
+                tabFirstLoad2 = false;
+                Tab2Listloading();
+            } 
+            // 第三个tab
+            else if (index === 2 && tabFirstLoad3) {
+                tabFirstLoad3 = false;
+                Tab3Listloading();
+            }
+        };
+    })
+    
+    
 });
 require.config({
     paths: {
-        "zepto": "../src/jslib/zepto.min",
         "iscroll": "../src/jslib/iscroll.min",
         "listloading": "../dist/js/listloading.min"
     }
